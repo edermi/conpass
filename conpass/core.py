@@ -14,7 +14,7 @@ from conpass.ldapconnection import LdapConnection
 from conpass.password import Password
 from conpass.user import USER_STATUS
 from conpass.session import Session
-from conpass.utils import get_list_from_file
+from conpass.utils import get_list_from_file, get_PDC
 
 lock = threading.RLock()
 
@@ -113,14 +113,13 @@ class ThreadPool:
         if self.arguments.v > 1:
             self.debug = True
 
-        # Resolve IP address from arguments.domain
-        self.dc_ip = arguments.dc_ip
-        if not self.dc_ip:
-            try:
-                self.dc_ip = socket.gethostbyname(arguments.domain)
-            except socket.gaierror as e:
-                self.console.log(f"Error resolving IP address from {arguments.domain}. Please specify the IP address with -dc-ip")
-                exit(1)
+        pdc_query_result = get_PDC(arguments.domain)
+        if pdc_query_result:
+            self.console.log("Using PDC {0} at {1}".format(pdc_query_result[0], pdc_query_result[1]))
+            self.dc_ip = pdc_query_result[1]
+        else:
+            self.console.log(f"Error finding and resolving a PDC for {arguments.domain}. Does 'nslookup -type=SRV _ldap._tcp.pdc._msdcs.<yourdomain>' yield any results?")
+            exit(1)
 
         with self.console.status("Retrieving users and password policies...") as status:
             self.ldapconnection = LdapConnection(host=self.dc_ip, domain=arguments.domain, username=arguments.username, password=arguments.password, console=status.console, debug=self.debug)

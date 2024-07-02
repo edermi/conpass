@@ -27,7 +27,8 @@ setup(
     install_requires=[
         'python-ldap',
         'impacket',
-        'rich'
+        'rich',
+        'dnspython'
     ],
     python_requires='>=3.6',
     classifiers=[

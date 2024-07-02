@@ -18,8 +18,6 @@ def main():
     group_auth.add_argument('-u', '--username', action='store', help='Username', required=True)
     group_auth.add_argument('-p', '--password', action='store', help='Plaintext password', required=True)
     group_auth.add_argument('-d', '--domain', default="", action='store', help='Domain name', required=True)
-    group_auth.add_argument('-dc-ip', action='store', metavar="ip address",
-                            help='IP Address of the primary domain controller.')
 
     group_spray = parser.add_argument_group('Spray')
     group_spray.add_argument('-P', '--password-file', action='store', help='File containing passwords to test', required=True)
